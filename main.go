@@ -9,14 +9,34 @@ import (
 )
 
 func main() {
-	fmt.Println("Start with lap string")
+	fmt.Println("get category")
+	CallCategoryMethod()
+	fmt.Println("========================")
+	fmt.Println("get brand")
 	CallBrandMethod()
 
-	// fmt.Println("End with top 1 string")
-	// CallEndsWithMethod()
+}
 
-	// fmt.Println("Contains bile string")
-	// CallContainsMethod()
+func CallCategoryMethod() {
+	db, err := config.GetMySQLDB()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		productModel := models.ProductModel{
+			Db: db,
+		}
+		categories, err2 := productModel.SearchCategory("voucher")
+		if err2 != nil {
+			fmt.Println(err2)
+		} else {
+			for _, cat := range categories {
+				fmt.Println("Id:", cat.Id)
+				fmt.Println("Name:", cat.Name)
+				fmt.Println("Slug :", slug.Make(cat.Name))
+				fmt.Println("----------------------------")
+			}
+		}
+	}
 }
 
 func CallBrandMethod() {
