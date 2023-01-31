@@ -10,6 +10,28 @@ type ProductModel struct {
 	Db *sql.DB
 }
 
+func (productModel ProductModel) SearchProducts(keyword string) ([]entities.Products, error) {
+	fmt.Println("keyword products", keyword)
+	rows, err := productModel.Db.Query("SELECT `bb_product_variation`.`bb_product_variation_id`, `bb_product_variation`.`bb_product_variation_name` FROM `bb_product` LEFT JOIN `bb_product_variation` ON `bb_product`.`bb_product_id` = `bb_product_variation`.`bb_product_id` LEFT JOIN `bb_member` ON `bb_product`.`bb_member_id` = `bb_member`.`bb_member_id` WHERE `bb_product_variation`.`bb_product_variation_stock` > 0 AND `bb_member`.`bb_member_status_email_verified` = 1 AND `bb_member`.`bb_member_status_rekening_verified` = 1 AND `bb_product_variation`.`bb_product_variation_status` = 1 AND `bb_product_variation`.`bb_product_variation_master_id` = 0 AND LOWER(bb_product_variation.bb_product_variation_name) like ? GROUP BY `bb_product_variation`.`bb_product_variation_name` ORDER BY `bb_product_variation`.`bb_product_variation_terjual` DESC LIMIT 10", "%"+keyword+"%")
+	if err != nil {
+		return nil, err
+	} else {
+		pro := []entities.Products{}
+		for rows.Next() {
+			var id int64
+			var name string
+			err2 := rows.Scan(&id, &name)
+			if err2 != nil {
+				return nil, err2
+			} else {
+				cat := entities.Products{id, name}
+				pro = append(pro, cat)
+			}
+		}
+		return pro, nil
+	}
+}
+
 func (productModel ProductModel) SearchCategory(keyword string) ([]entities.Category, error) {
 	fmt.Println("keyword category", keyword)
 	rows, err := productModel.Db.Query("SELECT bb_product_category_id, bb_product_category_name FROM bb_product_category WHERE LOWER(bb_product_category_name) like ? AND bb_product_category_status = 1 ORDER BY `bb_product_category_sequence` ASC LIMIT 10", "%"+keyword+"%")

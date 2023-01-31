@@ -14,7 +14,32 @@ func main() {
 	fmt.Println("========================")
 	fmt.Println("get brand")
 	CallBrandMethod()
+	fmt.Println("========================")
+	fmt.Println("get product")
+	CallProductMethod()
 
+}
+
+func CallProductMethod() {
+	db, err := config.GetMySQLDB()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		productModel := models.ProductModel{
+			Db: db,
+		}
+		products, err2 := productModel.SearchProducts("voucher")
+		if err2 != nil {
+			fmt.Println(err2)
+		} else {
+			for _, product := range products {
+				fmt.Println("Id:", product.Id)
+				fmt.Println("Name:", product.Name)
+				fmt.Println("Slug :", slug.Make(product.Name))
+				fmt.Println("----------------------------")
+			}
+		}
+	}
 }
 
 func CallCategoryMethod() {
