@@ -10,6 +10,28 @@ type ProductModel struct {
 	Db *sql.DB
 }
 
+func (productModel ProductModel) SearchStore(keyword string) ([]entities.Store, error) {
+	fmt.Println("keyword category", keyword)
+	rows, err := productModel.Db.Query("select bb_member.bb_member_id, bb_member.bb_member_uuid, bb_member_store.bb_member_store_id, bb_member_store.bb_member_store_uuid, bb_member_store.bb_member_store_name, bb_member_store.bb_member_store_photo from bb_member_store join bb_member on (bb_member.bb_member_id = bb_member_store.bb_member_id) where bb_member.bb_member_id <> 1 and bb_member.bb_member_status = 1 and bb_member_store.bb_member_store_status = 1 and LOWER(bb_member_store.bb_member_store_name) like ? order by bb_member_store.bb_member_store_name ASC limit 10", "%"+keyword+"%")
+	if err != nil {
+		return nil, err
+	} else {
+		stores := []entities.Store{}
+		for rows.Next() {
+			var id int64
+			var name, uuid, store_id, store_uuid, photo string
+			err2 := rows.Scan(&id, &uuid, &store_id, &store_uuid, &name, &photo)
+			if err2 != nil {
+				return nil, err2
+			} else {
+				stor := entities.Store{id, uuid, store_id, store_uuid, name, photo}
+				stores = append(stores, stor)
+			}
+		}
+		return stores, nil
+	}
+}
+
 func (productModel ProductModel) SearchProducts(keyword string) ([]entities.Products, error) {
 	fmt.Println("keyword products", keyword)
 	rows, err := productModel.Db.Query("SELECT `bb_product_variation`.`bb_product_variation_id`, `bb_product_variation`.`bb_product_variation_name` FROM `bb_product` LEFT JOIN `bb_product_variation` ON `bb_product`.`bb_product_id` = `bb_product_variation`.`bb_product_id` LEFT JOIN `bb_member` ON `bb_product`.`bb_member_id` = `bb_member`.`bb_member_id` WHERE `bb_product_variation`.`bb_product_variation_stock` > 0 AND `bb_member`.`bb_member_status_email_verified` = 1 AND `bb_member`.`bb_member_status_rekening_verified` = 1 AND `bb_product_variation`.`bb_product_variation_status` = 1 AND `bb_product_variation`.`bb_product_variation_master_id` = 0 AND LOWER(bb_product_variation.bb_product_variation_name) like ? GROUP BY `bb_product_variation`.`bb_product_variation_name` ORDER BY `bb_product_variation`.`bb_product_variation_terjual` DESC LIMIT 10", "%"+keyword+"%")
