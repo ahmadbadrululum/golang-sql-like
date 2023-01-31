@@ -6,4 +6,9 @@ type Product struct {
 	Price    float32
 	Quantity int
 	Status   bool
+	// var id int64
+	// var name string
+	// var price float32
+	// var quantity int
+	// var status bool
 }

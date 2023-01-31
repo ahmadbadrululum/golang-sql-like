@@ -7,10 +7,14 @@ import (
 )
 
 func GetMySQLDB() (db *sql.DB, err error) {
+	// dbDriver := "mysql"
+	// dbUser := "bad"
+	// dbPass := "123qwe"
+	// dbName := "learngodb"
 	dbDriver := "mysql"
 	dbUser := "bad"
 	dbPass := "123qwe"
-	dbName := "learngodb"
+	dbName := "crm_vcgasia"
 	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
 	return
 }

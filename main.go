@@ -4,17 +4,42 @@ import (
 	"fmt"
 	"golang-database-search/config"
 	"golang-database-search/models"
+
+	"github.com/gosimple/slug"
 )
 
 func main() {
 	fmt.Println("Start with lap string")
-	CallStartWithMethod()
+	CallBrandMethod()
 
-	fmt.Println("End with top 1 string")
-	CallEndsWithMethod()
+	// fmt.Println("End with top 1 string")
+	// CallEndsWithMethod()
 
-	fmt.Println("Contains bile string")
-	CallContainsMethod()
+	// fmt.Println("Contains bile string")
+	// CallContainsMethod()
+}
+
+func CallBrandMethod() {
+	db, err := config.GetMySQLDB()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		productModel := models.ProductModel{
+			Db: db,
+		}
+		brands, err2 := productModel.SearchBrand("voucher")
+		if err2 != nil {
+			fmt.Println(err2)
+		} else {
+			for _, brand := range brands {
+				fmt.Println("Id:", brand.Id)
+				fmt.Println("Name:", brand.Name)
+				fmt.Println("Slug :", slug.Make(brand.Name))
+				fmt.Println("Photo", brand.Photo)
+				fmt.Println("----------------------------")
+			}
+		}
+	}
 }
 
 func CallStartWithMethod() {
